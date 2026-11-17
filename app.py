@@ -229,14 +229,14 @@ elif page == "3. Lead Detail":
         cur.execute("SELECT onion, score, band, review_status FROM leads WHERE band = 'high' ORDER BY score DESC")
     else:
         cur.execute("SELECT onion, score, band, review_status FROM leads ORDER BY score DESC")
-    
+
     all_leads = cur.fetchall()
 
     if not all_leads:
         st.info(f"No leads matching triage filter '{filter_choice}'.")
     else:
         lead_options = [r["onion"] for r in all_leads]
-        
+
         # Keep selected lead across re-renders
         prev_onion = st.session_state.get("current_lead_onion")
         default_index = 0

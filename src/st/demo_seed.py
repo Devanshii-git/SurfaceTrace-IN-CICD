@@ -11,14 +11,12 @@ fully populated dataset matching all blueprint specifications:
 """
 from __future__ import annotations
 
-import os
 import random
 import shutil
-import sqlite3
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from st.db import get_conn, init_db, log_run
+from st.db import get_conn, init_db
 from st.extract import make_valid_v3
 from st.score import score_all
 
