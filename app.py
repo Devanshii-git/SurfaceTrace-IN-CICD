@@ -139,19 +139,21 @@ elif page == "2. Leads":
 
     col_f1, col_f2, col_f3 = st.columns(3)
     with col_f1:
-        band_filter = st.selectbox("Filter by Band", ["All", "high", "medium", "low"])
+        band_disp = st.selectbox("Filter by Band", ["All", "High", "Medium", "Low"], key="p2_band")
+        band_filter = band_disp.lower()
     with col_f2:
-        status_filter = st.selectbox("Filter by Review Status", ["All", "new", "relevant", "irrelevant", "escalate"])
+        status_disp = st.selectbox("Filter by Review Status", ["All", "New", "Relevant", "Irrelevant", "Escalate"], key="p2_status")
+        status_filter = status_disp.lower()
     with col_f3:
-        search_query = st.text_input("Search (Address / Note)", "")
+        search_query = st.text_input("Search (Address / Note)", "", key="p2_search")
 
     query = "SELECT onion, score, band, doc_count, source_count, review_status, reviewer, note, updated_at FROM leads WHERE 1=1"
     params = []
 
-    if band_filter != "All":
+    if band_filter != "all":
         query += " AND band = ?"
         params.append(band_filter)
-    if status_filter != "All":
+    if status_filter != "all":
         query += " AND review_status = ?"
         params.append(status_filter)
     if search_query:
@@ -164,6 +166,8 @@ elif page == "2. Leads":
     cur.execute(query, params)
     rows = cur.fetchall()
 
+    st.caption(f"Displaying **{len(rows)}** matching leads (ordered by Score descending)")
+
     if rows:
         data = []
         for r in rows:
@@ -172,10 +176,10 @@ elif page == "2. Leads":
                     "Onion Address": format_address(r["onion"], show_full_onion),
                     "Raw Onion": r["onion"],
                     "Score": r["score"],
-                    "Band": r["band"],
+                    "Band": r["band"].upper(),
                     "Documents": r["doc_count"],
                     "Sources": r["source_count"],
-                    "Review Status": r["review_status"],
+                    "Review Status": r["review_status"].upper(),
                     "Reviewer": r["reviewer"] or "",
                     "Note": r["note"] or "",
                     "Updated": r["updated_at"] or "",
@@ -205,22 +209,50 @@ elif page == "2. Leads":
 elif page == "3. Lead Detail":
     st.header("🔎 Lead Detail & Annotation")
 
+    # Display persistent alert if a lead was just reviewed
+    if "review_alert" in st.session_state:
+        st.success(st.session_state.pop("review_alert"))
+
     cur = conn.cursor()
-    cur.execute("SELECT onion, score, band FROM leads ORDER BY score DESC")
+
+    # Quick triage filter so analysts can directly view only new leads
+    filter_choice = st.radio(
+        "Triage Filter",
+        ["All Leads", "Unreviewed (new) Only", "High Band Only"],
+        horizontal=True,
+        key="lead_triage_filter",
+    )
+
+    if filter_choice == "Unreviewed (new) Only":
+        cur.execute("SELECT onion, score, band, review_status FROM leads WHERE review_status = 'new' ORDER BY score DESC")
+    elif filter_choice == "High Band Only":
+        cur.execute("SELECT onion, score, band, review_status FROM leads WHERE band = 'high' ORDER BY score DESC")
+    else:
+        cur.execute("SELECT onion, score, band, review_status FROM leads ORDER BY score DESC")
+    
     all_leads = cur.fetchall()
 
     if not all_leads:
-        st.info("No leads available. Run the pipeline first.")
+        st.info(f"No leads matching triage filter '{filter_choice}'.")
     else:
         lead_options = [r["onion"] for r in all_leads]
-        lead_labels = [f"{format_address(r['onion'], show_full_onion)} (Score: {r['score']}, Band: {r['band']})" for r in all_leads]
+        
+        # Keep selected lead across re-renders
+        prev_onion = st.session_state.get("current_lead_onion")
+        default_index = 0
+        if prev_onion and prev_onion in lead_options:
+            default_index = lead_options.index(prev_onion)
+
         selected_idx = st.selectbox(
             "Select Lead to Review",
             range(len(lead_options)),
-            format_func=lambda idx: lead_labels[idx],
+            index=default_index,
+            format_func=lambda idx: f"{format_address(all_leads[idx]['onion'], show_full_onion)} | Score: {all_leads[idx]['score']} | [{all_leads[idx]['review_status'].upper()}]",
+            key="lead_detail_selector",
         )
 
         selected_onion = lead_options[selected_idx]
+        st.session_state["current_lead_onion"] = selected_onion
 
         cur.execute("SELECT * FROM leads WHERE onion = ?", (selected_onion,))
         lead = cur.fetchone()
@@ -254,15 +286,33 @@ elif page == "3. Lead Detail":
         else:
             st.info("No mentions found for this address.")
 
-        st.markdown("### Human Review Annotation")
-        st.markdown(f"Current Status: **{lead['review_status']}** (Reviewer: `{lead['reviewer'] or 'None'}`)")
+        st.markdown("---")
+        st.subheader("Human Review Annotation")
 
-        note_input = st.text_area("Reviewer Note", value=lead["note"] or "", placeholder="Enter context observations...")
+        status_badge_map = {
+            "relevant": "🟢 **RELEVANT**",
+            "irrelevant": "🔴 **IRRELEVANT**",
+            "escalate": "🚨 **ESCALATE (RULE 4 STOP)**",
+            "new": "🟡 **NEW (UNREVIEWED)**",
+        }
+        badge = status_badge_map.get(lead["review_status"], lead["review_status"].upper())
+        st.markdown(f"Current Review Status: {badge}")
+        if lead["reviewer"]:
+            st.caption(f"Last recorded reviewer: `{lead['reviewer']}` | Updated at: `{lead['updated_at']}`")
+
+        note_key = f"note_area_{selected_onion}"
+        note_input = st.text_area(
+            "Reviewer Note",
+            value=lead["note"] or "",
+            placeholder="Enter context observations or investigative notes...",
+            key=note_key,
+        )
 
         btn_c1, btn_c2, btn_c3 = st.columns(3)
 
         def save_review(new_status: str):
             now_iso = datetime.now(timezone.utc).isoformat()
+            typed_note = st.session_state.get(note_key, lead["note"] or "")
             with conn:
                 conn.execute(
                     """
@@ -270,19 +320,20 @@ elif page == "3. Lead Detail":
                     SET review_status = ?, reviewer = ?, note = ?, updated_at = ?
                     WHERE onion = ?
                     """,
-                    (new_status, reviewer_name, note_input, now_iso, selected_onion),
+                    (new_status, reviewer_name, typed_note, now_iso, selected_onion),
                 )
-            st.success(f"Status updated to '{new_status}' by {reviewer_name}")
+            st.session_state["current_lead_onion"] = selected_onion
+            st.session_state["review_alert"] = f"✅ Lead `{format_address(selected_onion, show_full_onion)}` updated to **{new_status.upper()}** by {reviewer_name}!"
             st.rerun()
 
         with btn_c1:
-            if st.button("✅ Relevant", use_container_width=True):
+            if st.button("✅ Relevant", use_container_width=True, key=f"btn_rel_{selected_onion}"):
                 save_review("relevant")
         with btn_c2:
-            if st.button("❌ Irrelevant", use_container_width=True):
+            if st.button("❌ Irrelevant", use_container_width=True, key=f"btn_irrel_{selected_onion}"):
                 save_review("irrelevant")
         with btn_c3:
-            if st.button("🚨 Escalate", use_container_width=True):
+            if st.button("🚨 Escalate", use_container_width=True, key=f"btn_esc_{selected_onion}"):
                 save_review("escalate")
 
 conn.close()
