@@ -29,59 +29,72 @@
 
 ---
 
-## 🏛️ System Architecture
+## 🏛️ System Architecture & Team Bifurcation of Work
+
+The pipeline architecture cleanly bifurcates responsibilities across team members, with all stages decoupled through an embedded **SQLite Write-Ahead Logging (WAL) database**:
+
+```
+[1. Search & Collect] (Shivang)  ──►  [2. Polite Fetch] (Shivang)  ──►  [3. Crypto Extract] (Devanshi)
+  • 24 Seed Research Papers             • robots.txt compliance           • Defanging (xyz[.]onion)
+  • 40 Multi-Pillar Queries             • Rate limiting (1s delay)        • Ed25519 Checksum (SHA3-256)
+  • Web, Ahmia, GitHub, RSS             • Text extraction (≤ 20k chars)   • 300-char context window
+                                                                                   │
+                                                                                   ▼
+[6. DevSecOps & Eval] (Shreyash) ◄──  [5. Review Dashboard] (Devanshi) ◄── [4. Threat Scoring] (Devanshi)
+  • Precision per band (100% High)      • Streamlit 3-page UI             • Context points (max 50)
+  • Baseline ranking comparison         • Masked addresses (expyuzz5...)  • Recurrence score (max 25)
+  • 28/28 automated test suite          • Relevant / Irrelevant triage    • Source diversity (max 25)
+```
 
 ```mermaid
 flowchart LR
-    subgraph S1["1. Collection Layer"]
-        A1["Seed Research Papers"]
+    subgraph S1["Stage 1: Collection Layer (Shivang)"]
+        A1["Seed Papers (24 Sources)"]
         A2["Web Search (40 Queries)"]
         A3["Ahmia Clearnet Index"]
         A4["GitHub Threat Repos"]
         A5["Cybersecurity RSS Feeds"]
     end
 
-    subgraph S2["2. Polite Fetching"]
+    subgraph S2["Stage 2: Polite Ingestion (Shivang)"]
         B1["robots.txt Enforcer"]
-        B2["Rate Limiter (1s delay)"]
-        B3["Text Extractor (max 20k chars)"]
+        B2["Domain Rate Limiter (1s)"]
+        B3["HTML Text Extractor (max 20k)"]
     end
 
-    subgraph S3["3. Cryptographic Extraction"]
+    subgraph S3["Stage 3: Cryptographic Math Gate (Devanshi)"]
         C1["Defanging ([.]onion)"]
-        C2["Tor v3 Checksum Gate (SHA3-256)"]
+        C2["Tor v3 Checksum (SHA3-256)"]
         C3["300-char Context Snippet"]
     end
 
-    subgraph S4["4. Threat Scoring"]
-        D1["Context Score (max 50)"]
-        D2["Recurrence (max 25)"]
+    subgraph S4["Stage 4: Threat Scoring Engine (Devanshi)"]
+        D1["Context Points (max 50)"]
+        D2["Doc Recurrence (max 25)"]
         D3["Source Diversity (max 25)"]
-        D4["Banding: High / Med / Low"]
+        D4["Bands: High / Med / Low"]
     end
 
-    subgraph S5["5. Analyst Review"]
-        E1["Streamlit Dashboard"]
-        E2["Masked Addresses"]
-        E3["Relevant / Irrelevant / Escalate"]
+    subgraph S5["Stage 5: Review Dashboard (Devanshi)"]
+        E1["Overview KPIs & Charts"]
+        E2["Masked Leads Catalog"]
+        E3["Lead Detail & Live Triage"]
     end
 
-    subgraph S6["6. DevSecOps & Eval"]
-        F1["Precision per Band"]
-        F2["Baseline Comparison"]
-        F3["28/28 Automated Pytest Suite"]
+    subgraph S6["Stage 6: Platform & CI/CD (Shreyash)"]
+        F1["SQLite WAL Concurrency"]
+        F2["28 Automated Pytest Suite"]
+        F3["Precision Benchmarking"]
     end
 
     S1 --> S2 --> S3 --> S4 --> S5 --> S6
 ```
 
-All pipeline stages decouple data flow through an embedded **SQLite database in Write-Ahead Logging (WAL) mode** (`data/st.db`), enabling concurrent reader/writer execution with zero external database server overhead.
-
 ---
 
 ## 📚 Literature Review & Theoretical Foundation
 
-The project's architectural decisions synthesize findings from **13 peer-reviewed research papers** across four critical domains:
+The pipeline's architectural decisions synthesize findings from **13 peer-reviewed research papers** across four critical domains:
 
 ```
                                LITERATURE REVIEW MATRIX
@@ -107,7 +120,7 @@ The project's architectural decisions synthesize findings from **13 peer-reviewe
 
 Evaluating SurfaceTrace-IN against our verified benchmark dataset (**320 Documents, 269 Mentions, 105 Valid Leads**):
 
-| Metric | Measured Result | Significance |
+| Metric | Measured Result | Operational Significance |
 | :--- | :---: | :--- |
 | **High Priority Band Precision ($\ge 60$)** | **100.0%** | **55 True Leads / 0 False Alarms** in top tier. |
 | **Medium Priority Band Precision ($30\text{--}59$)** | **75.8%** | 25 Relevant / 8 Irrelevant (suspicious chatter). |
@@ -120,7 +133,7 @@ Evaluating SurfaceTrace-IN against our verified benchmark dataset (**320 Documen
 
 ## 🖥️ Analyst Review Dashboard Walkthrough (`app.py`)
 
-The human-in-the-loop triage interface runs on Streamlit and connects to the SQLite WAL database:
+The human-in-the-loop triage interface runs on Streamlit and connects directly to the SQLite WAL database:
 
 ### How to Launch:
 ```powershell
@@ -135,14 +148,14 @@ python -m streamlit run app.py
 │  [Sidebar] Reviewer: Analyst  |  [Toggle] Mask Onion (expyuzz5...)          │
 │  [Navigation]  1. Overview  |  2. Leads  |  3. Lead Detail                  │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│  PAGE 1: OVERVIEW                                                           │
+│  PAGE 1: PIPELINE OVERVIEW                                                  │
 │  ┌───────────────┐ ┌───────────────┐ ┌───────────────┐ ┌──────────────────┐ │
 │  │ 320 Documents │ │  269 Mentions │ │   105 Leads   │ │ 100/105 Reviewed │ │
 │  └───────────────┘ └───────────────┘ └───────────────┘ └──────────────────┘ │
 │  • Leads Distribution by Score Band (High: 57, Medium: 33, Low: 15)         │
 │  • Ingested Documents by Source (Web: 105, Ahmia: 65, GitHub: 60, RSS: 55) │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│  PAGE 2: LEADS CATALOG                                                      │
+│  PAGE 2: DISCOVERED LEADS CATALOG                                           │
 │  • Filters: Band (High/Med/Low) | Status (New/Relevant/Irrelevant/Escalate) │
 │  • Real-Time Search: Address substring or threat keyword (e.g., 'Lashkar')  │
 │  • Safety: Addresses masked by default (expyuzz5...); no clickable links   │
@@ -221,13 +234,13 @@ SurfaceTrace-IN is engineered to operate strictly within the legal bounds of the
 
 ---
 
-## 👥 Team & Architectural Roles
+## 👥 Project Team & Core Responsibilities
 
-| Team Member | Engineering & Research Domain |
-| :--- | :--- |
-| **Devanshi Jain** | **Extraction, Scoring & Dashboard:** Cryptographic Math Gate (`is_valid_v3`), Tri-Factor Threat Scoring Model, Streamlit Review Dashboard (`app.py`), and Triage Annotation SOP. |
-| **Shivang Mangal** | **Ingestion & Collection Layer:** 5 Surface-web Collectors, Curated Seed Papers, Multi-Pillar Query Engine (`config/queries.txt`), and Polite Fetching Architecture. |
-| **Shreyash Shivhare** | **Platform, Evaluation & DevSecOps:** SQLite WAL Concurrency, CLI Interfaces (`cli.py`), DevSecOps CI/CD Pipeline (`.github/workflows/ci.yml`), Automated Test Suite (28 tests), and Empirical Evaluation. |
+| Team Member | Engineering Role | Core Responsibilities & Technical Contributions |
+| :--- | :--- | :--- |
+| **Devanshi Jain** | **Lead — Extraction, Threat Scoring & Dashboard** | • Built the **Tor v3 Cryptographic Math Gate** (`is_valid_v3`) validating Ed25519 public keys and SHA3-256 checksum digests.<br>• Designed the deterministic **Tri-Factor Threat Scoring Algorithm** ($0\text{--}100$) with keyword weighting and noise penalties.<br>• Developed the interactive **Streamlit Review Dashboard** with session state persistence and real-time review triage. |
+| **Shivang Mangal** | **Lead — Collection & Ingestion Layer** | • Developed the **5 Surface-Web Collectors** (Academic Seeds, Web Search, Ahmia Index, GitHub Repos, RSS Feeds).<br>• Curated the **24 Counter-Terrorism Seed Papers** and formulated the **40 Multi-Pillar Search Queries**.<br>• Engineered the **Polite Fetching Engine** with `robots.txt` caching, 1s domain rate limiting, and boilerplate text stripping. |
+| **Shreyash Shivhare** | **Lead — Platform, DevSecOps & Evaluation** | • Architected the high-concurrency **SQLite Write-Ahead Logging (WAL)** database layer.<br>• Built the **DevSecOps CI/CD Pipeline** with GitHub Actions and multi-stage Docker containerization.<br>• Authored the **28-Test Automated Pytest Suite** and the **Empirical Evaluation Engine** for precision benchmarking and Cohen's Kappa. |
 
 ---
 
