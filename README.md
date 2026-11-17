@@ -29,26 +29,26 @@
 
 ---
 
-## 🏛️ System Architecture & Team Bifurcation of Work
+## 🏛️ System Architecture & End-to-End Pipeline
 
-The pipeline architecture cleanly bifurcates responsibilities across team members, with all stages decoupled through an embedded **SQLite Write-Ahead Logging (WAL) database**:
+The pipeline architecture decouples data flow across 6 automated stages through an embedded **SQLite Write-Ahead Logging (WAL) database**:
 
 ```
-[1. Search & Collect] (Shivang)  ──►  [2. Polite Fetch] (Shivang)  ──►  [3. Crypto Extract] (Devanshi)
-  • 24 Seed Research Papers             • robots.txt compliance           • Defanging (xyz[.]onion)
-  • 40 Multi-Pillar Queries             • Rate limiting (1s delay)        • Ed25519 Checksum (SHA3-256)
-  • Web, Ahmia, GitHub, RSS             • Text extraction (≤ 20k chars)   • 300-char context window
-                                                                                   │
-                                                                                   ▼
-[6. DevSecOps & Eval] (Shreyash) ◄──  [5. Review Dashboard] (Devanshi) ◄── [4. Threat Scoring] (Devanshi)
-  • Precision per band (100% High)      • Streamlit 3-page UI             • Context points (max 50)
-  • Baseline ranking comparison         • Masked addresses (expyuzz5...)  • Recurrence score (max 25)
-  • 28/28 automated test suite          • Relevant / Irrelevant triage    • Source diversity (max 25)
+[1. Multi-Source Ingestion]  ──►  [2. Polite Ingestion Engine]  ──►  [3. Cryptographic Math Gate]
+  • 24 Seed Research Papers         • robots.txt enforcement            • Defanging (xyz[.]onion)
+  • 40 Multi-Pillar Queries         • Rate limiting (1s delay)          • Ed25519 Checksum (SHA3-256)
+  • Web, Ahmia, GitHub, RSS         • Text extraction (≤ 20k chars)     • 300-char context window
+                                                                                │
+                                                                                ▼
+[6. DevSecOps & Evaluation]  ◄──  [5. Analyst Review Dashboard] ◄──  [4. Threat Scoring Model]
+  • Precision per band (100% High)  • Streamlit 3-page UI               • Context points (max 50)
+  • Baseline ranking comparison     • Masked addresses (expyuzz5...)    • Recurrence score (max 25)
+  • 28/28 automated test suite      • Relevant / Irrelevant triage      • Source diversity (max 25)
 ```
 
 ```mermaid
 flowchart LR
-    subgraph S1["Stage 1: Collection Layer (Shivang)"]
+    subgraph S1["Stage 1: Multi-Source Collection"]
         A1["Seed Papers (24 Sources)"]
         A2["Web Search (40 Queries)"]
         A3["Ahmia Clearnet Index"]
@@ -56,32 +56,32 @@ flowchart LR
         A5["Cybersecurity RSS Feeds"]
     end
 
-    subgraph S2["Stage 2: Polite Ingestion (Shivang)"]
+    subgraph S2["Stage 2: Polite Ingestion Engine"]
         B1["robots.txt Enforcer"]
         B2["Domain Rate Limiter (1s)"]
         B3["HTML Text Extractor (max 20k)"]
     end
 
-    subgraph S3["Stage 3: Cryptographic Math Gate (Devanshi)"]
+    subgraph S3["Stage 3: Cryptographic Math Gate"]
         C1["Defanging ([.]onion)"]
         C2["Tor v3 Checksum (SHA3-256)"]
         C3["300-char Context Snippet"]
     end
 
-    subgraph S4["Stage 4: Threat Scoring Engine (Devanshi)"]
+    subgraph S4["Stage 4: Threat Scoring Engine"]
         D1["Context Points (max 50)"]
         D2["Doc Recurrence (max 25)"]
         D3["Source Diversity (max 25)"]
         D4["Bands: High / Med / Low"]
     end
 
-    subgraph S5["Stage 5: Review Dashboard (Devanshi)"]
+    subgraph S5["Stage 5: Analyst Review Dashboard"]
         E1["Overview KPIs & Charts"]
         E2["Masked Leads Catalog"]
         E3["Lead Detail & Live Triage"]
     end
 
-    subgraph S6["Stage 6: Platform & CI/CD (Shreyash)"]
+    subgraph S6["Stage 6: DevSecOps & Evaluation"]
         F1["SQLite WAL Concurrency"]
         F2["28 Automated Pytest Suite"]
         F3["Precision Benchmarking"]
