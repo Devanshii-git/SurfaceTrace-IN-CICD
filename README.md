@@ -240,9 +240,9 @@ SurfaceTrace-IN is engineered to operate strictly within the legal bounds of the
 
 | Team Member | Engineering Role |
 | :--- | :--- |
-| **Devanshi Jain** | Lead — Extraction, Threat Scoring & Review Dashboard |
-| **Shivang Mangal** | Lead — Collection, Seed Curation & Ingestion Layer |
-| **Shreyash Shivhare** | Lead — Platform Architecture, DevSecOps CI/CD & Evaluation |
+| **Devanshi Jain** | Cryptographic Extraction, Threat Scoring & UI Engineer |
+| **Shivang Mangal** | OSINT Collection & Ingestion Pipeline Engineer |
+| **Shreyash Shivhare** | Platform Architecture & DevSecOps Engineer |
 
 ---
 
