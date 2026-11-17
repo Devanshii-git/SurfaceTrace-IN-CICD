@@ -87,14 +87,14 @@ def determine_band(score: int) -> str:
     return "low"
 
 
-def score_all() -> int:
+def score_all(db_path: Path | str | None = None) -> int:
     """Rebuild score, band, doc_count, and source_count for all leads.
 
     Never overwrites review fields (review_status, reviewer, note).
     Returns total leads scored.
     """
     started_at = datetime.now(timezone.utc).isoformat()
-    conn = get_conn()
+    conn = get_conn(db_path)
     total_leads = 0
     error_msg = None
 

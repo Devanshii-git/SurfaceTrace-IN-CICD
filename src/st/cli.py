@@ -209,3 +209,14 @@ def evaluate_cmd() -> None:
         )
     typer.echo("=" * 60)
 
+
+@app.command("seed-demo")
+def seed_demo_cmd() -> None:
+    """Populate data/demo.db and sync to data/st.db with realistic test leads."""
+    from st.demo_seed import generate_demo_database
+
+    typer.echo("Generating realistic demo dataset per blueprint specifications...")
+    generate_demo_database()
+    typer.echo("✓ Demo dataset ready for Streamlit dashboard and evaluation.")
+
+

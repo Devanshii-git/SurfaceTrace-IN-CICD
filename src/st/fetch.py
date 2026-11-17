@@ -13,7 +13,12 @@ from urllib.parse import urlparse
 from urllib.robotparser import RobotFileParser
 
 import requests
-import trafilatura
+from bs4 import BeautifulSoup
+
+try:
+    import trafilatura
+except ImportError:
+    trafilatura = None
 
 from st.db import get_conn, log_run
 
@@ -126,13 +131,19 @@ def fetch_url(url: str) -> tuple[str, str | None]:
     except Exception:
         html_str = raw_content.decode("utf-8", errors="replace")
 
-    # Extract clean text using trafilatura
-    extracted = trafilatura.extract(
-        html_str,
-        include_comments=False,
-        include_tables=False,
-        no_fallback=False,
-    )
+    # Extract clean text using trafilatura (or BeautifulSoup fallback)
+    if trafilatura is not None:
+        extracted = trafilatura.extract(
+            html_str,
+            include_comments=False,
+            include_tables=False,
+            no_fallback=False,
+        )
+    else:
+        soup = BeautifulSoup(html_str, "html.parser")
+        for tag in soup(["script", "style", "nav", "footer", "header", "noscript"]):
+            tag.decompose()
+        extracted = soup.get_text(separator=" ", strip=True)
 
     clean_text = extracted or ""
     # Truncate to max 20,000 characters
