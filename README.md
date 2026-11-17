@@ -234,13 +234,13 @@ SurfaceTrace-IN is engineered to operate strictly within the legal bounds of the
 
 ---
 
-## 👥 Project Team & Core Responsibilities
+## 👥 Project Team & Roles
 
-| Team Member | Engineering Role | Core Responsibilities & Technical Contributions |
-| :--- | :--- | :--- |
-| **Devanshi Jain** | **Lead — Extraction, Threat Scoring & Dashboard** | • Built the **Tor v3 Cryptographic Math Gate** (`is_valid_v3`) validating Ed25519 public keys and SHA3-256 checksum digests.<br>• Designed the deterministic **Tri-Factor Threat Scoring Algorithm** ($0\text{--}100$) with keyword weighting and noise penalties.<br>• Developed the interactive **Streamlit Review Dashboard** with session state persistence and real-time review triage. |
-| **Shivang Mangal** | **Lead — Collection & Ingestion Layer** | • Developed the **5 Surface-Web Collectors** (Academic Seeds, Web Search, Ahmia Index, GitHub Repos, RSS Feeds).<br>• Curated the **24 Counter-Terrorism Seed Papers** and formulated the **40 Multi-Pillar Search Queries**.<br>• Engineered the **Polite Fetching Engine** with `robots.txt` caching, 1s domain rate limiting, and boilerplate text stripping. |
-| **Shreyash Shivhare** | **Lead — Platform, DevSecOps & Evaluation** | • Architected the high-concurrency **SQLite Write-Ahead Logging (WAL)** database layer.<br>• Built the **DevSecOps CI/CD Pipeline** with GitHub Actions and multi-stage Docker containerization.<br>• Authored the **28-Test Automated Pytest Suite** and the **Empirical Evaluation Engine** for precision benchmarking and Cohen's Kappa. |
+| Team Member | Engineering Role |
+| :--- | :--- |
+| **Devanshi Jain** | Lead — Extraction, Threat Scoring & Review Dashboard |
+| **Shivang Mangal** | Lead — Collection, Seed Curation & Ingestion Layer |
+| **Shreyash Shivhare** | Lead — Platform Architecture, DevSecOps CI/CD & Evaluation |
 
 ---
 
