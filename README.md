@@ -34,85 +34,91 @@
 The pipeline architecture decouples data flow across 6 automated stages through an embedded **SQLite Write-Ahead Logging (WAL) database**:
 
 ```
-[1. Multi-Source Ingestion]  ──►  [2. Polite Ingestion Engine]  ──►  [3. Cryptographic Math Gate]
-  • 24 Seed Research Papers         • robots.txt enforcement            • Defanging (xyz[.]onion)
-  • 40 Multi-Pillar Queries         • Rate limiting (1s delay)          • Ed25519 Checksum (SHA3-256)
-  • Web, Ahmia, GitHub, RSS         • Text extraction (≤ 20k chars)     • 300-char context window
-                                                                                │
-                                                                                ▼
-[6. DevSecOps & Evaluation]  ◄──  [5. Analyst Review Dashboard] ◄──  [4. Threat Scoring Model]
-  • Precision per band (100% High)  • Streamlit 3-page UI               • Context points (max 50)
-  • Baseline ranking comparison     • Masked addresses (expyuzz5...)    • Recurrence score (max 25)
-  • 28/28 automated test suite      • Relevant / Irrelevant triage      • Source diversity (max 25)
+┌─────────────────────────┐     ┌─────────────────────────┐     ┌─────────────────────────┐
+│ 1. MULTI-SOURCE         │     │ 2. POLITE INGESTION     │     │ 3. CRYPTOGRAPHIC        │
+│    COLLECTION           │ ──► │    ENGINE               │ ──► │    MATH GATE            │
+│ • 24 Curated Seed URLs  │     │ • robots.txt compliance │     │ • Defanging ([.]onion)  │
+│ • 40 Search Queries     │     │ • 1s/domain rate limit  │     │ • Ed25519 SHA3-256 Math │
+│ • Ahmia, GitHub, RSS    │     │ • Cap text ≤ 20k chars  │     │ • 300-char context cut  │
+└─────────────────────────┘     └─────────────────────────┘     └─────────────────────────┘
+                                                                             │
+                                                                             ▼
+┌─────────────────────────┐     ┌─────────────────────────┐     ┌─────────────────────────┐
+│ 6. DEVSECOPS &          │     │ 5. ANALYST REVIEW       │     │ 4. THREAT SCORING       │
+│    BENCHMARK EVALUATION │ ◄── │    DASHBOARD            │ ◄── │    MODEL (0 - 100)      │
+│ • 100% High Band Prec.  │     │ • Streamlit 3-Page UI   │     │ • Context (max 50)      │
+│ • Cohen's Kappa = 0.812 │     │ • Masked Addresses      │     │ • Recurrence (max 25)   │
+│ • 28/28 Automated Tests │     │ • Live Triage & Notes   │     │ • Diversity (max 25)    │
+└─────────────────────────┘     └─────────────────────────┘     └─────────────────────────┘
 ```
 
 ```mermaid
-flowchart LR
-    subgraph S1["Stage 1: Multi-Source Collection"]
-        A1["Seed Papers (24 Sources)"]
-        A2["Web Search (40 Queries)"]
-        A3["Ahmia Clearnet Index"]
-        A4["GitHub Threat Repos"]
-        A5["Cybersecurity RSS Feeds"]
+flowchart TD
+    classDef collect fill:#1E293B,stroke:#38BDF8,stroke-width:2px,color:#F8FAFC;
+    classDef fetch fill:#1E293B,stroke:#818CF8,stroke-width:2px,color:#F8FAFC;
+    classDef extract fill:#1E293B,stroke:#34D399,stroke-width:2px,color:#F8FAFC;
+    classDef score fill:#1E293B,stroke:#FBBF24,stroke-width:2px,color:#F8FAFC;
+    classDef review fill:#1E293B,stroke:#F472B6,stroke-width:2px,color:#F8FAFC;
+    classDef eval fill:#1E293B,stroke:#A78BFA,stroke-width:2px,color:#F8FAFC;
+    classDef db fill:#0F172A,stroke:#F97316,stroke-width:3px,color:#FED7AA;
+
+    subgraph Pipeline["SurfaceTrace-IN End-to-End OSINT Pipeline"]
+        direction LR
+        S1["🌐 Stage 1: Multi-Source Collection<br/>• 24 Seed Research Papers<br/>• 40 Multi-Pillar Queries<br/>• Ahmia Clearnet Index<br/>• GitHub Repos & RSS Feeds"]:::collect
+        S2["🛡️ Stage 2: Polite Fetching Engine<br/>• robots.txt Enforcer<br/>• 1s Domain Rate Limiter<br/>• HTML Cleaner (≤ 20k chars)"]:::fetch
+        S3["🔐 Stage 3: Cryptographic Gate<br/>• Text Defanging (xyz[.]onion)<br/>• Ed25519 PubKey Extraction<br/>• SHA3-256 Checksum Validation<br/>• 300-char Context Snippet"]:::extract
+        S4["🎯 Stage 4: Threat Scoring Engine<br/>• Context Keyword Points (≤ 50)<br/>• Document Recurrence (≤ 25)<br/>• Source Diversity (≤ 25)<br/>• Noise Penalty Subtraction (-5)"]:::score
+        S5["🖥️ Stage 5: Analyst Review Dashboard<br/>• Streamlit 3-Page Interface<br/>• Default Address Masking<br/>• Unreviewed Triage Radio<br/>• Live Relevant/Irrelevant Action"]:::review
+        S6["⚙️ Stage 6: DevSecOps & Evaluation<br/>• High Band Precision: 100.0%<br/>• Cohen's Kappa: κ = 0.812<br/>• 28/28 Automated Test Suite<br/>• Docker Multi-Stage Build"]:::eval
     end
 
-    subgraph S2["Stage 2: Polite Ingestion Engine"]
-        B1["robots.txt Enforcer"]
-        B2["Domain Rate Limiter (1s)"]
-        B3["HTML Text Extractor (max 20k)"]
-    end
+    DB[("💾 SQLite WAL Database<br/>(data/st.db)<br/>Single-Writer / Multi-Reader Concurrency")]:::db
 
-    subgraph S3["Stage 3: Cryptographic Math Gate"]
-        C1["Defanging ([.]onion)"]
-        C2["Tor v3 Checksum (SHA3-256)"]
-        C3["300-char Context Snippet"]
-    end
-
-    subgraph S4["Stage 4: Threat Scoring Engine"]
-        D1["Context Points (max 50)"]
-        D2["Doc Recurrence (max 25)"]
-        D3["Source Diversity (max 25)"]
-        D4["Bands: High / Med / Low"]
-    end
-
-    subgraph S5["Stage 5: Analyst Review Dashboard"]
-        E1["Overview KPIs & Charts"]
-        E2["Masked Leads Catalog"]
-        E3["Lead Detail & Live Triage"]
-    end
-
-    subgraph S6["Stage 6: DevSecOps & Evaluation"]
-        F1["SQLite WAL Concurrency"]
-        F2["28 Automated Pytest Suite"]
-        F3["Precision Benchmarking"]
-    end
-
-    S1 --> S2 --> S3 --> S4 --> S5 --> S6
+    S1 -->|"URLs (status: new)"| DB
+    DB -->|"Pending URLs"| S2
+    S2 -->|"Clean HTML Text"| DB
+    DB -->|"Fetched Documents"| S3
+    S3 -->|"Valid .onion Mentions"| DB
+    DB -->|"Unscored Leads"| S4
+    S4 -->|"Scores & Priority Bands"| DB
+    DB <-->|"Human Triage & Notes"| S5
+    DB -->|"Labeled Benchmarks"| S6
 ```
 
 ---
 
-## 📚 Literature Review & Theoretical Foundation
+## 📑 Project Documentation
 
-The pipeline's architectural decisions synthesize findings from **13 peer-reviewed research papers** across four critical domains:
+The project includes complete, publication-grade academic and operational documentation:
 
-```
-                               LITERATURE REVIEW MATRIX
-┌───────────────────────────────────────────────┬───────────────────────────────────────────────┐
-│ 1. Surface-to-Darknet References & Forensics  │ 2. Extremism Detection & CTI Frameworks       │
-│ • Faizan & Schwittmann (2020): Proved that    │ • Sarker et al. (2023): Validated human-in-   │
-│   dark-web sites heavily rely on clearnet     │   the-loop ML for Jihadist Da'wa analysis.    │
-│   mentions for initial audience discovery.    │ • MAD-CTI (2024): Demonstrated multi-agent    │
-│ • "The Onions Have Eyes" (2018): Tor v3       │   threat ingestion for dark-web surveillance. │
-│   structure & Ed25519 checksum mechanics.     │ • Systematic reviews on hacker forums & CTI.  │
-├───────────────────────────────────────────────┼───────────────────────────────────────────────┤
-│ 3. Extremist Text & Multilingual NLP          │ 4. DevSecOps & Secure Software Supply Chain   │
-│ • Hindi-English Code-Mixed Hate Speech (2022):│ • NIST SSDF SP 800-218: Secure development    │
-│   Addressed India-specific dialect challenges.│   framework practices embedded into CI/CD.    │
-│ • Extremism Detection Datasets & Taxonomy     │ • DevSecOps CI/CD Integration (2023): Policy  │
-│   (2023): Context keyword weights formulation.│   gates for automated regression testing.     │
-└───────────────────────────────────────────────┴───────────────────────────────────────────────┘
-```
+| Document | File Path | Scope & Purpose |
+| :--- | :--- | :--- |
+| **📘 Final Academic Project Report** | [`docs/report.md`](docs/report.md) | **4,261-word formal research manuscript** covering the operational threat context in India, statutory legal analysis (IT Act 2000 Section 67B, UAPA Section 39), literature synthesis of 13 papers, cryptographic math formulas, tri-factor scoring equations, empirical results, and DevSecOps verification. |
+| **📗 Team Operations & Defense Playbook** | [`docs/team_guide.md`](docs/team_guide.md) | **Comprehensive team handbook & viva defense guide** for Devanshi, Shivang, and Shreyash detailing step-by-step execution, the Extremist Paradox, why each source was selected, examiner defense Q&A, and terminal commands. |
+| **📙 Analyst Review Standard Operating Procedure** | [`docs/labelling_guide.md`](docs/labelling_guide.md) | **Standard Operating Procedure (SOP)** defining explicit criteria for classifying discovered leads into *Relevant*, *Irrelevant*, and *Escalate (Rule 4 Stop)*. |
+| **📊 Executive Presentation Deck** | [`SurfaceTrace_IN.pptx`](SurfaceTrace_IN.pptx) | **20-slide visual defense presentation deck** covering problem statement, literature review, research gaps, methodology, architecture, and live benchmark evaluation. |
+
+---
+
+## 📚 Research Papers & Academic References
+
+The system's architecture and scoring weights are grounded in **13 peer-reviewed research papers** preserved in [`Research Papers/`](Research%20Papers/):
+
+| # | Paper Title & Authors | Venue / Publisher | Research Contribution to SurfaceTrace-IN |
+| :-: | :--- | :--- | :--- |
+| **1** | **A First Look at References from the Dark to Surface Web World**<br>*Zabihimayvan & Doran* | ACM / Wright State | Empirical proof that darknet hidden services heavily depend on surface-web references for discovery. |
+| **2** | **The Onions Have Eyes: A Structure & Privacy Analysis of Tor Hidden Services**<br>*Sanchez-Rola, Balzarotti, & Santos* | DeustoTech / EURECOM | Structural analysis of Tor v3 addresses, proving naive regex matching is insufficient without Ed25519 checksums. |
+| **3** | **Detecting Terrorist Influencers Using Reciprocal Human-Machine Learning**<br>*Lewinsky, Te'eni, Yahav-Shenberger, Schwartz, et al.* | Nature / Social Science Computer Review | Conceptual basis for our human-in-the-loop review dashboard over black-box automated classifiers. |
+| **4** | **Methodologies for Data Collection and Analysis of Dark Web Forum Content**<br>*de-Marcos, Medina-Merodio, & Stapic* | MDPI Applied Sciences (2025) | Systematic survey highlighting the legal liabilities and technical bottlenecks of direct dark-web scraping. |
+| **5** | **MAD-CTI: Cyber Threat Intelligence Analysis Using a Multi-Agent Framework**<br>*Shah & Madisetti* | IEEE Access (2025) | Architecture for multi-source intelligence ingestion and structured threat indicator extraction. |
+| **6** | **Navigating the Shadows: Manual & Semi-Automated Evaluation of the Dark Web**<br>*IEEE Research Group* | IEEE Access (2024) | Empirical study on hidden service volatility, proving surface-web footprints provide higher temporal stability. |
+| **7** | **Online Extremism Detection: Datasets, Classification & Validation Methods**<br>*IEEE Survey Team* | IEEE Access (2021) | Taxonomy of extremist keywords and proof that deep neural networks suffer from poor legal auditability. |
+| **8** | **Hate Speech Detection in Hindi-English Code-Mixed Data**<br>*Bohra, Vijay, Singh, & Shrivastava* | LREC (2020) | Addressed India-specific code-mixing (Hinglish) and regional linguistic threat nuances. |
+| **9** | **Threats from the Dark: A Review over Dark Web Investigation Research**<br>*Basheer & Alkhatib* | SVU / Review Article (2021) | Survey establishing the need for automated validation gates to reject synthetic spam addresses. |
+| **10** | **Cybercrime Threat Intelligence: A Systematic Multi-Vocal Literature Review**<br>*Al-Nabki et al.* | Elsevier / Computers & Security (2021) | Demonstrated the geographical bias of existing CTI tools and absence of Indian threat coverage. |
+| **11** | **A Systematic Review on Using Hacker Forums on the Dark Web for CTI**<br>*AMCIS Research Group* | AMCIS (2022) | Analysis of threat forums, informing our polite rate-limiting and query engineering strategies. |
+| **12** | **Secure Software Development Framework (SSDF) Version 1.1 (NIST SP 800-218)**<br>*Souppaya, Scarfone, & Dodson* | NIST Special Publication | Established secure development lifecycle standards implemented across our pipeline. |
+| **13** | **Strategies for Integrating Software Supply Chain Security in DevSecOps (NIST SP 800-204D)**<br>*Chandramouli, Kautz, & Torres-Arias* | NIST Special Publication | Framework for automated policy gates (`robots.txt`, payload caps) in CI/CD workflows. |
 
 ---
 
