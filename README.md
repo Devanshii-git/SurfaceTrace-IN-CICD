@@ -87,38 +87,34 @@ flowchart TD
 
 ---
 
-## 📑 Project Documentation
-
-The project includes complete, publication-grade academic and operational documentation:
-
-| Document | File Path | Scope & Purpose |
-| :--- | :--- | :--- |
-| **📘 Final Academic Project Report** | [`docs/report.md`](docs/report.md) | **4,261-word formal research manuscript** covering the operational threat context in India, statutory legal analysis (IT Act 2000 Section 67B, UAPA Section 39), literature synthesis of 13 papers, cryptographic math formulas, tri-factor scoring equations, empirical results, and DevSecOps verification. |
-| **📗 Team Operations & Defense Playbook** | [`docs/team_guide.md`](docs/team_guide.md) | **Comprehensive team handbook & viva defense guide** for Devanshi, Shivang, and Shreyash detailing step-by-step execution, the Extremist Paradox, why each source was selected, examiner defense Q&A, and terminal commands. |
-| **📙 Analyst Review Standard Operating Procedure** | [`docs/labelling_guide.md`](docs/labelling_guide.md) | **Standard Operating Procedure (SOP)** defining explicit criteria for classifying discovered leads into *Relevant*, *Irrelevant*, and *Escalate (Rule 4 Stop)*. |
-| **📊 Executive Presentation Deck** | [`SurfaceTrace_IN.pptx`](SurfaceTrace_IN.pptx) | **20-slide visual defense presentation deck** covering problem statement, literature review, research gaps, methodology, architecture, and live benchmark evaluation. |
-
----
-
 ## 📚 Research Papers & Academic References
 
 The system's architecture and scoring weights are grounded in **13 peer-reviewed research papers** preserved in [`Research Papers/`](Research%20Papers/):
 
 | # | Paper Title & Authors | Venue / Publisher | Research Contribution to SurfaceTrace-IN |
 | :-: | :--- | :--- | :--- |
-| **1** | **A First Look at References from the Dark to Surface Web World**<br>*Zabihimayvan & Doran* | ACM / Wright State | Empirical proof that darknet hidden services heavily depend on surface-web references for discovery. |
-| **2** | **The Onions Have Eyes: A Structure & Privacy Analysis of Tor Hidden Services**<br>*Sanchez-Rola, Balzarotti, & Santos* | DeustoTech / EURECOM | Structural analysis of Tor v3 addresses, proving naive regex matching is insufficient without Ed25519 checksums. |
-| **3** | **Detecting Terrorist Influencers Using Reciprocal Human-Machine Learning**<br>*Lewinsky, Te'eni, Yahav-Shenberger, Schwartz, et al.* | Nature / Social Science Computer Review | Conceptual basis for our human-in-the-loop review dashboard over black-box automated classifiers. |
-| **4** | **Methodologies for Data Collection and Analysis of Dark Web Forum Content**<br>*de-Marcos, Medina-Merodio, & Stapic* | MDPI Applied Sciences (2025) | Systematic survey highlighting the legal liabilities and technical bottlenecks of direct dark-web scraping. |
-| **5** | **MAD-CTI: Cyber Threat Intelligence Analysis Using a Multi-Agent Framework**<br>*Shah & Madisetti* | IEEE Access (2025) | Architecture for multi-source intelligence ingestion and structured threat indicator extraction. |
-| **6** | **Navigating the Shadows: Manual & Semi-Automated Evaluation of the Dark Web**<br>*IEEE Research Group* | IEEE Access (2024) | Empirical study on hidden service volatility, proving surface-web footprints provide higher temporal stability. |
-| **7** | **Online Extremism Detection: Datasets, Classification & Validation Methods**<br>*IEEE Survey Team* | IEEE Access (2021) | Taxonomy of extremist keywords and proof that deep neural networks suffer from poor legal auditability. |
-| **8** | **Hate Speech Detection in Hindi-English Code-Mixed Data**<br>*Bohra, Vijay, Singh, & Shrivastava* | LREC (2020) | Addressed India-specific code-mixing (Hinglish) and regional linguistic threat nuances. |
-| **9** | **Threats from the Dark: A Review over Dark Web Investigation Research**<br>*Basheer & Alkhatib* | SVU / Review Article (2021) | Survey establishing the need for automated validation gates to reject synthetic spam addresses. |
-| **10** | **Cybercrime Threat Intelligence: A Systematic Multi-Vocal Literature Review**<br>*Al-Nabki et al.* | Elsevier / Computers & Security (2021) | Demonstrated the geographical bias of existing CTI tools and absence of Indian threat coverage. |
-| **11** | **A Systematic Review on Using Hacker Forums on the Dark Web for CTI**<br>*AMCIS Research Group* | AMCIS (2022) | Analysis of threat forums, informing our polite rate-limiting and query engineering strategies. |
-| **12** | **Secure Software Development Framework (SSDF) Version 1.1 (NIST SP 800-218)**<br>*Souppaya, Scarfone, & Dodson* | NIST Special Publication | Established secure development lifecycle standards implemented across our pipeline. |
-| **13** | **Strategies for Integrating Software Supply Chain Security in DevSecOps (NIST SP 800-204D)**<br>*Chandramouli, Kautz, & Torres-Arias* | NIST Special Publication | Framework for automated policy gates (`robots.txt`, payload caps) in CI/CD workflows. |
+| **1** | **MAD-CTI: Cyber Threat Intelligence Analysis Using a Multi-Agent Framework**<br>*S. Shah & V. K. Madisetti* | IEEE Access, vol. 13 (2025) | Architecture for multi-source intelligence ingestion and structured threat indicator extraction. |
+| **2** | **Methodologies for Data Collection and Analysis of Dark Web Forum Content**<br>*L. de-Marcos, J.-A. Medina-Merodio, & Z. Stapic* | MDPI Electronics, vol. 14 (2025) | Systematic survey highlighting the legal liabilities and technical bottlenecks of direct dark-web scraping. |
+| **3** | **Detecting Terrorist Influencers Using Reciprocal Human-Machine Learning**<br>*D. Lewinsky, D. Te'eni, I. Yahav-Shenberger, D. G. Schwartz, et al.* | Nature HSSC, vol. 11 (2024) | Conceptual basis for our human-in-the-loop review dashboard over black-box automated classifiers. |
+| **4** | **Navigating the Shadows: Manual & Semi-Automated Evaluation of the Dark Web for CTI**<br>*P. Kühn, K. Wittorf, & C. Reuter* | IEEE Access, vol. 12 (2024) | Empirical study on hidden service volatility, proving surface-web footprints provide higher temporal stability. |
+| **5** | **Software Supply Chain Security in DevSecOps CI/CD Pipelines**<br>*R. Chandramouli, F. Kautz, & S. Torres-Arias* | NIST SP 800-204D (2024) | Framework for automated policy gates (`robots.txt`, payload caps) in CI/CD workflows. |
+| **6** | **A Systematic Review on Using Hacker Forums on the Dark Web for CTI**<br>*A. Albizri, A. Nehme, & A. Harfouche* | AMCIS 2022 TREOs (2022) | Analysis of threat forums, informing our polite rate-limiting and query engineering strategies. |
+| **7** | **Secure Software Development Framework (SSDF) Version 1.1**<br>*M. Souppaya, K. Scarfone, & D. Dodson* | NIST SP 800-218 (2022) | Established secure development lifecycle standards implemented across our pipeline. |
+| **8** | **Threats from the Dark: A Review over Dark Web Investigation Research for CTI**<br>*R. Basheer & B. Alkhatib* | J. Comput. Networks & Commun. (2021) | Survey establishing the need for automated validation gates to reject synthetic spam addresses. |
+| **9** | **Cybercrime Threat Intelligence: A Systematic Multi-Vocal Review**<br>*G. Cascavilla, D. A. Tamburri, & W.-J. Van Den Heuvel* | Elsevier Computers & Security, vol. 105 (2021) | Demonstrated the geographical bias of existing CTI tools and absence of Indian threat coverage. |
+| **10** | **Online Extremism Detection: A Systematic Literature Review**<br>*M. Gaikwad et al.* | IEEE Access, vol. 9 (2021) | Taxonomy of extremist keywords and proof that deep neural networks suffer from poor legal auditability. |
+| **11** | **A Comparative Study of Hate Speech Detection Methods for Hindi-English Code-Mixed Data**<br>*P. Rani et al.* | Proc. LREC (2020) | Addressed India-specific code-mixing (Hinglish) and regional linguistic threat nuances. |
+| **12** | **A First Look at References from the Dark to Surface Web World**<br>*M. Zabihimayvan & D. Doran* | Proc. ACM Hypertext (2019) | Empirical proof that darknet hidden services heavily depend on surface-web references for discovery. |
+| **13** | **The Onions Have Eyes: Structure and Privacy Analysis of Tor Hidden Services**<br>*I. Sanchez-Rola, D. Balzarotti, & I. Santos* | Proc. ACM WWW (2017) | Structural analysis of Tor v3 addresses, proving naive regex matching is insufficient without Ed25519 checksums. |
+
+### 📜 Technical Specifications & Industry Guidelines (Documentations)
+
+In addition to academic research papers, the pipeline architecture strictly complies with official technical specifications and industry security guidelines as cited in the presentation:
+
+| Document / Specification | Author & Organization | Link / Reference | Architectural Role in SurfaceTrace-IN |
+| :--- | :--- | :--- | :--- |
+| **Tor Rendezvous Specification — Version 3** | N. Mathewson, G. Kadianakis, & D. Goulet (*The Tor Project*) | [`rend-spec-v3.txt`](https://spec.torproject.org/rend-spec-v3) | Formal mathematical specification for **Ed25519 32-byte public key extraction and SHA3-256 checksum verification** implemented in `src/st/extract.py`. |
+| **OWASP DevSecOps Guideline** | OWASP Foundation | [OWASP Project](https://owasp.org/www-project-devsecops-guideline/) | Formal industry guidelines for **automated security policy gates** (`robots.txt` compliance, domain rate limiting, payload capping, and dependency isolation). |
 
 ---
 
